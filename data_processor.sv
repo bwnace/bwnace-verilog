@@ -2,11 +2,7 @@
  * CMOS sensor output data processor
  */
 
-`define ImageDimX 1280
-`define ImageDimY 960
-`define ImageBitDepth 12
-`define ImageMemSize ( `ImageDimX * `ImageDimY )
-`define ImageAddrWidth ( $clog2(`ImageMemSize) )
+`include "image.sv"
 
 `define TriggerCycles 3840
 `define TriggerCntWidth ( $clog2(`TriggerCycles) )
@@ -98,6 +94,8 @@ module ImageSensorDataProcessor
     always_comb begin
         stateNext = state;
 
+        done = 0;
+
         pixelCommit = 0;
         pixelAddrClr = 0;
         pixelAddrInc = 0;
@@ -131,8 +129,10 @@ module ImageSensorDataProcessor
         ACTIVE: begin
             if (!sensorPixclk)
                 stateNext = READY;
-            if (pixelAddr == `ImageMemSize)
+            if (pixelAddr == `ImageMemSize) begin
                 stateNext = IDLE;
+                done = 1;
+            end
         end
         endcase
     end
