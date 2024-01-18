@@ -1,9 +1,9 @@
 `include "image.sv"
 
 module top
-  (input  logic CLOCK_50,
-   input  logic [3:0] KEY,
-   output logic [35:0] GPIO);
+  (input logic        CLOCK_50,
+   input logic [3:0]  KEY,
+   inout tri   [35:0] GPIO);
     
   //meta stable
   logic [3:0] keyA, keyB; //use keyB for later key inputs
