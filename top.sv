@@ -73,23 +73,27 @@ module top
   logic                       readEnable;
   logic [`ImageAddrWidth-1:0] readAdd;
   logic [`ImageBitDepth-1:0]  readData;
+  logic [11:0]                Dout;
+
+  assign Dout = {GPIO[18], GPIO[16], GPIO[14], GPIO[12], GPIO[10], GPIO[4], 
+                GPIO[2], GPIO[0], GPIO[1], GPIO[3], GPIO[5], GPIO[7]};
 
   controller ctrl (.reset(keyB[0]), .clock, .take_photo, .send_image(1'b0), 
         .done_init, .done_take, .done_send, .init, .take, .send);
 
   SensorInitializer initial (.clock, .reset(keyB[0]), .start(init), 
-        .done(done_init), .vdd_pll(), .vaa(), .vdd_io(), .vdd(), .vdd_slvs(), //output to GPIO
-        .extclk(), .reset_bar()); //output to GPIO
+        .done(done_init), .vdd_pll(GPIO[6]), .vaa(GPIO[17]), .vdd_io(GPIO[20]), .vdd(GPIO[24]), .vdd_slvs(), //output to GPIO
+        .extclk(GPIO[8]), .reset_bar(GPIO[26])); //output to GPIO
 
   ImageSensorDataProcessor data_process (.clock, .reset(keyB[0]), .error(), //error can be ignored
         .start(take), .done(done_take),
-        .sensorDout(), 
-        .sensorPixclk(),
-        .sensorLineValid(), .sensorFrameValid(), //input from GPIO
+        .sensorDout(Dout), 
+        .sensorPixclk(GPIO[22]),
+        .sensorLineValid(GPIO[27]), .sensorFrameValid(GPIO[29]), //input from GPIO
         .readEnable, .readAddr, .readData);
 
   ImageReader send_image(.clock, .reset(keyB[0]), .start(send), 
         .done(done_send),
-        .data(), //output to GPIO
+        .data(), //output to ethernet or vga
         .readEnable, .readAddr, .readData);  
 endmodule: top
