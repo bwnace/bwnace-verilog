@@ -42,6 +42,11 @@ module controller
         take = 1'b0;
         send = 1'b0;
       end
+      default: begin
+        init = 1'b1;
+        take = 1'b0;
+        send = 1'b0;
+      end
     endcase
   end
 
@@ -52,6 +57,7 @@ module controller
       WAIT: nextState = take_photo ? PHOTO : (send_image ? SEND : WAIT);
       SEND: nextState = done_send ? WAIT : SEND;
       PHOTO: nextState = done_take ? WAIT : PHOTO;
+      default: nextState = INIT;
     endcase
   end 
 endmodule : controller
