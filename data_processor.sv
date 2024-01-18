@@ -41,6 +41,7 @@ module ImageSensorDataProcessor
 
         input  logic start,
         output logic done,
+        output logic sensorTrigger,
         input  logic [11:0] sensorDout,
         input  logic sensorPixclk,
         input  logic sensorLineValid, sensorFrameValid,
@@ -103,6 +104,8 @@ module ImageSensorDataProcessor
         triggerCntClr = 0;
         triggerCntInc = 0;
 
+        sensorTrigger = 0;
+
         case (state)
         IDLE: begin
             if (start) begin
@@ -113,6 +116,7 @@ module ImageSensorDataProcessor
             end
         end
         TRIGGER: begin
+            sensorTrigger = 1;
             triggerCntInc = 1;
             if (triggerCnt == `TriggerCycles) begin
                 stateNext = READY;

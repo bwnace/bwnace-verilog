@@ -47,6 +47,8 @@ module ImageReader
         readAddr = pixelAddr;
         data = readData;
 
+        done = 0;
+
         case (state)
         IDLE: begin
             if (start) begin

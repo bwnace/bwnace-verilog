@@ -37,6 +37,8 @@ module SensorInitializer
         rstCounterClr = 0;
         initCounterClr = 0;
 
+        done = 0;
+
         case (state)
         0: begin
             if (start) begin
@@ -69,13 +71,13 @@ module SensorInitializer
             end
         end
         5: begin
-            if (rstCounter == 50000) begin
+            if (rstCounter == 500/*50000*/) begin
                 stateNext = 6;
                 initCounterClr = 1;
             end
         end
         6: begin
-            if (initCounterClr == 160000) begin
+            if (initCounter == 500/*160000*/) begin
                 stateNext = 7;
                 done = 1;
             end
