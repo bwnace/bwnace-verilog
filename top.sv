@@ -18,7 +18,7 @@ module top
   enum logic [1:0] {WAIT = 2'd0, PRESS1 = 2'd1, 
                     PRESS2 = 2'd2, PRESS3 = 2'd3} state, nextState;
 
-  always_ff @(posedge clock, posedge reset) begin 
+  always_ff @(posedge clock, posedge keyB[0]) begin 
     if (keyB[0])
       state <= START;
     else
@@ -68,26 +68,28 @@ module top
   end 
 
   //INSTANTIATE EVERYTYING
-  logic done_init, done_take, done_send;
-  logic init, take, send;
-  logic readEnable;
+  logic                       done_init, done_take, done_send;
+  logic                       init, take, send;
+  logic                       readEnable;
   logic [`ImageAddrWidth-1:0] readAdd;
-  logic [`ImageBitDepth-1:0] readData;
+  logic [`ImageBitDepth-1:0]  readData;
 
-  controller ctrl (.reset, .clock, .take_photo, .send_image(1'b0), .done_init, 
-        .done_take, .done_send, .init, .take, .send);
+  controller ctrl (.reset(keyB[0]), .clock, .take_photo, .send_image(1'b0), 
+        .done_init, .done_take, .done_send, .init, .take, .send);
 
-  SensorInitializer initial (.clock, .reset, .start(init), .done(done_init),
-        .vdd_pll(), .vaa(), .vdd_io(), .vdd(), .vdd_slvs(), .extclk(), .reset_bar()); //outputs to GPIO
+  SensorInitializer initial (.clock, .reset(keyB[0]), .start(init), 
+        .done(done_init), .vdd_pll(), .vaa(), .vdd_io(), .vdd(), .vdd_slvs(), //output to GPIO
+        .extclk(), .reset_bar()); //output to GPIO
 
-  ImageSensorDataProcessor data_process (.clock, .reset, .error(), 
+  ImageSensorDataProcessor data_process (.clock, .reset(keyB[0]), .error(), //error can be ignored
         .start(take), .done(done_take),
         .sensorDout(), 
         .sensorPixclk(),
-        .sensorLineValid(), sensorFrameValid(), //input from GPIO
+        .sensorLineValid(), .sensorFrameValid(), //input from GPIO
         .readEnable, .readAddr, .readData);
-        
-  ImageReader send_image(.clock, .reset, .start(send), .done(done_send),
+
+  ImageReader send_image(.clock, .reset(keyB[0]), .start(send), 
+        .done(done_send),
         .data(), //output to GPIO
         .readEnable, .readAddr, .readData);  
 endmodule: top
