@@ -80,17 +80,19 @@ module top
   assign Dout = {GPIO[18], GPIO[16], GPIO[14], GPIO[12], GPIO[10], GPIO[4], 
                 GPIO[2], GPIO[0], GPIO[1], GPIO[3], GPIO[5], GPIO[7]};
 
-  controller ctrl (.reset(keyB[0]), .clock(CLOCK_50), .take_photo, .send_image(1'b0), 
-        .done_init, .done_take, .done_send, .init, .take, .send);
+  controller ctrl (.reset(keyB[0]), .clock(CLOCK_50), .take_photo, 
+        .send_image(1'b0), .done_init, .done_take, .done_send, 
+        .init, .take, .send);
 
   SensorInitializer initializer(.clock(CLOCK_50), .reset(keyB[0]), .start(init), 
-        .done(done_init), .vdd_pll(GPIO[6]), .vaa(GPIO[17]), .vdd_io(GPIO[20]), .vdd(GPIO[24]), .vdd_slvs(), //output to GPIO
+        .done(done_init), .vdd_pll(GPIO[6]), .vaa(GPIO[17]), .vdd_io(GPIO[20]), 
+        .vdd(GPIO[24]), .vdd_slvs(), //output to GPIO
         .extclk(GPIO[8]), .reset_bar(GPIO[26])); //output to GPIO
 
-  ImageSensorDataProcessor data_process(.clock(CLOCK_50), .reset(keyB[0]), .error(), //error can be ignored
-        .start(take), .done(done_take),
-        .sensorDout(Dout), 
-        .sensorPixclk(GPIO[22]),
+  ImageSensorDataProcessor data_process(.clock(CLOCK_50), .reset(keyB[0]), 
+        .error(), //error can be ignored
+        .start(take), .done(done_take), .sensorTrigger(GPIO[31]),
+        .sensorDout(Dout), .sensorPixclk(GPIO[22]),
         .sensorLineValid(GPIO[27]), .sensorFrameValid(GPIO[29]), //input from GPIO
         .readEnable, .readAddr, .readData);
 
